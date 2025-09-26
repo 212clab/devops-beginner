@@ -1,4 +1,3 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
@@ -11,7 +10,7 @@ services:
     networks:
       - app-network
 
-  # Backend Service  
+  # Backend Service
   backend:
     build: ./backend
     container_name: fullstack-backend
@@ -22,6 +21,8 @@ services:
     depends_on:
       - postgres
       - redis
+    ports:
+      - "5001:5000"  # backend 직접 접근용 포트
     networks:
       - app-network
 
@@ -30,9 +31,9 @@ services:
     image: postgres:15-alpine
     container_name: fullstack-db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -49,11 +50,11 @@ services:
       - app-network
 
   # Reverse Proxy
-  nginx:
-    build: ./nginx
+  proxy:
+    build: ./nginx  # nginx 폴더에 Dockerfile 필요
     container_name: fullstack-proxy
     ports:
-      - "80:80"
+      - "8080:80"  # 외부 8080 → 내부 80
     depends_on:
       - frontend
       - backend
