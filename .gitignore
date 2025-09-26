@@ -1,0 +1,61 @@
+# Docker 관련
+*.log
+Dockerfile.local
+docker-compose.local.yml
+docker-compose.override.yml
+volumes/
+data/
+
+# 프론트엔드 (Node.js 기반)
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-error.log*
+yarn.lock
+package-lock.json
+
+# 백엔드 (예: Python, Java 등)
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+.venv/
+env/
+venv/
+*.log
+.env
+.env.local
+
+# 모니터링 (Grafana/Prometheus)
+grafana/data/
+prometheus/data/
+*.db
+*.sqlite3
+
+# macOS 시스템 파일
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE 및 에디터
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# 민감한 정보
+*.pem
+*.key
+*.crt
+*.env
+secrets/
+credentials/
