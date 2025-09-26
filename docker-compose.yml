@@ -54,7 +54,7 @@ services:
     build: ./nginx  # nginx 폴더에 Dockerfile 필요
     container_name: fullstack-proxy
     ports:
-      - "8080:80"  # 외부 8080 → 내부 80
+      - "80:80"
     depends_on:
       - frontend
       - backend
