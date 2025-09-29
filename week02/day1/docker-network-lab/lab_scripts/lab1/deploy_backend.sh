@@ -1,4 +1,12 @@
-# Redis 컨테이너 실행
+#!/bin/bash
+
+# Week 2 Day 1 Lab 1: 백엔드 서비스 구축 스크립트
+# 사용법: ./deploy_backend.sh
+
+echo "=== 백엔드 서비스 구축 시작 ==="
+
+# Redis 캐시 서버 배포
+echo "1. Redis 캐시 서버 배포 중..."
 docker run -d \
   --name redis-cache \
   --network backend-net \
@@ -6,12 +14,16 @@ docker run -d \
   redis:7-alpine
 
 # Redis 연결 테스트
+echo "2. Redis 연결 테스트..."
+sleep 5
 docker exec redis-cache redis-cli ping
 docker exec redis-cache redis-cli set test-key "Hello Redis"
 docker exec redis-cache redis-cli get test-key
 
+# API 서버 소스 코드 생성
+echo "3. API 서버 소스 코드 생성 중..."
 
-# 간단한 API 서버 Dockerfile 생성
+# Dockerfile 생성
 cat > Dockerfile << 'EOF'
 FROM node:18-alpine
 WORKDIR /app
@@ -59,7 +71,11 @@ const dbConfig = {
 };
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    server: process.env.HOSTNAME || 'unknown'
+  });
 });
 
 app.get('/users', async (req, res) => {
@@ -68,7 +84,11 @@ app.get('/users', async (req, res) => {
     const [rows] = await connection.execute('SELECT * FROM users');
     await connection.end();
     
-    res.json({ users: rows, source: 'database' });
+    res.json({ 
+      users: rows, 
+      source: 'database',
+      server: process.env.HOSTNAME || 'unknown'
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -80,26 +100,16 @@ app.listen(port, '0.0.0.0', () => {
 EOF
 
 # API 서버 이미지 빌드
+echo "4. API 서버 이미지 빌드 중..."
 docker build -t api-server:latest .
 
-# API 서버 인스턴스 2개 실행 (충돌 방지)
-echo "=== API 서버 실행 ==="
-
-# 기존 API 서버 컨테이너 제거 (충돌 방지)
-docker rm -f api-server-1 api-server-2 2>/dev/null || true
-
+# API 서버 인스턴스 2개 실행
+echo "5. API 서버 인스턴스 배포 중..."
 docker run -d \
   --name api-server-1 \
   --network backend-net \
   --ip 172.20.2.20 \
   api-server:latest
-
-if [ $? -eq 0 ]; then
-    echo "✓ api-server-1 실행 성공"
-else
-    echo "✗ api-server-1 실행 실패"
-    exit 1
-fi
 
 docker run -d \
   --name api-server-2 \
@@ -107,13 +117,26 @@ docker run -d \
   --ip 172.20.2.21 \
   api-server:latest
 
-if [ $? -eq 0 ]; then
-    echo "✓ api-server-2 실행 성공"
-else
-    echo "✗ api-server-2 실행 실패"
-    exit 1
-fi
-
 # API 서버들을 데이터베이스 네트워크에도 연결
+echo "6. API 서버를 데이터베이스 네트워크에 연결 중..."
 docker network connect database-net api-server-1
 docker network connect database-net api-server-2
+
+# 서비스 상태 확인
+echo "7. 백엔드 서비스 상태 확인..."
+sleep 10
+echo "Redis 상태:"
+docker exec redis-cache redis-cli ping
+
+echo "API 서버 1 상태:"
+docker exec api-server-1 curl -s http://localhost:3000/health
+
+echo "API 서버 2 상태:"
+docker exec api-server-2 curl -s http://localhost:3000/health
+
+echo "=== 백엔드 서비스 구축 완료 ==="
+echo ""
+echo "배포된 백엔드 서비스:"
+echo "- Redis 캐시: redis-cache (172.20.2.10:6379)"
+echo "- API 서버 1: api-server-1 (172.20.2.20:3000)"
+echo "- API 서버 2: api-server-2 (172.20.2.21:3000)"

@@ -37,14 +37,3 @@ echo "생성된 네트워크:"
 echo "- frontend-net: 172.20.1.0/24 (외부 접근 가능)"
 echo "- backend-net: 172.20.2.0/24 (내부 통신용)"
 echo "- database-net: 172.20.3.0/24 (격리된 네트워크)"
-
-
-# 각 네트워크의 상세 정보 확인
-echo "=== Frontend Network ==="
-docker network inspect frontend-net | grep -A 5 "IPAM"
-
-echo "=== Backend Network ==="
-docker network inspect backend-net | grep -A 5 "IPAM"
-
-echo "=== Database Network ==="
-docker network inspect database-net | grep -A 5 "IPAM"
