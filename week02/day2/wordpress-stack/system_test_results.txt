@@ -1,0 +1,61 @@
+WordPress Stack 시스템 테스트 결과 - #오후
+=================================================
+======================
+📊 컨테이너 실행 상태:
+monitoring-dashboard   Up 7 minutes                 0.0.0.0:9090->80/tcp, [::]:9090->80/tcp
+nginx-proxy            Up 10 minutes (healthy)      0.0.0.0:80->80/tcp, [::]:80->80/tcp
+wordpress-app          Up About an hour (healthy)   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+redis-session          Up About an hour (healthy)   6379/tcp
+mysql-wordpress        Up About an hour (healthy)   3306/tcp
+
+🏥 컨테이너 헬스 체크:
+✅ mysql-wordpress: 정상
+✅ wordpress-app: 정상
+✅ redis-session: 정상
+✅ nginx-proxy: 정상
+===============================
+💾 볼륨 상태:
+local     mysql-data
+local     redis-data
+local     wp-content
+
+📊 볼륨 사용량:
+mysql-data: 158.3M
+wp-content: 19.8M
+redis-data: 16.0K
+====================
+🗄️ MySQL 연결 테스트:
+✅ MySQL 연결 성공
+
+🔄 Redis 연결 테스트:
+✅ Redis 연결 성공
+
+🌐 WordPress 연결 테스트:
+✅ WordPress 직접 연결 성공
+
+🔄 Nginx 프록시 테스트:
+✅ Nginx 프록시 연결 성공
+===============
+⚡ 응답 시간 테스트:
+평균 응답 시간: 0.001199초
+✅ 응답 시간 양호
+
+🔄 동시 연결 테스트 (10개 요청):
+성공한 요청: 10/10
+✅ 동시 연결 테스트 통과
+======================
+📝 테스트 데이터 삽입:
+✅ 테스트 데이터 삽입 성공
+
+🔄 컨테이너 재시작 테스트:
+✅ 데이터 영속성 확인됨 (레코드 수: 1)
+====================
+🔄 백업 스크립트 실행:
+❌ 백업 파일 생성 실패
+======================
+📊 테스트 결과 통계:
+성공: 12
+경고: 0
+실패: 1
+시스템 점수: 92/100
+🎉 시스템 상태: 우수
