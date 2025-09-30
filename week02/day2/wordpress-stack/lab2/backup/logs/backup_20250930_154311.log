@@ -1,9 +1,0 @@
-[2025-09-30 15:43:11] === Backup started (Type: daily) ===
-[2025-09-30 15:43:11] Starting database backup...
-[2025-09-30 15:43:11] Database backup completed successfully
-[2025-09-30 15:43:11] Starting WordPress files backup...
-[2025-09-30 15:43:16] WordPress files backup completed
-[2025-09-30 15:43:16] Verifying backup integrity...
-[2025-09-30 15:43:16] Backup file sizes - DB: 0 bytes, WP: 0 bytes
-[2025-09-30 15:43:16] ✅ Backup verification completed
-[2025-09-30 15:43:16] === Backup completed successfully ===
