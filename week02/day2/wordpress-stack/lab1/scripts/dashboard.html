@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WordPress Stack 모니터링</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="30">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { display: inline-block; padding: 5px 10px; border-radius: 20px; color: white; font-weight: bold; }
+        .status.ok { background: #4CAF50; }
+        .status.warning { background: #FF9800; }
+        .status.error { background: #F44336; }
+        .metric { display: inline-block; margin: 10px; padding: 15px; background: #e3f2fd; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐳 WordPress Stack 모니터링 대시보드</h1>
+        
+        <div class="card">
+            <h3>📊 서비스 상태</h3>
+            <div id="services">
+                <span class="status ok">MySQL</span>
+                <span class="status ok">WordPress</span>
+                <span class="status ok">Redis</span>
+                <span class="status ok">Nginx</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📈 시스템 메트릭</h3>
+            <div class="metric">
+                <strong>CPU 사용률</strong><br>
+                <span id="cpu">Loading...</span>
+            </div>
+            <div class="metric">
+                <strong>메모리 사용률</strong><br>
+                <span id="memory">Loading...</span>
+            </div>
+            <div class="metric">
+                <strong>디스크 사용률</strong><br>
+                <span id="disk">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>🐳 컨테이너 정보</h3>
+            <table>
+                <tr>
+                    <th>컨테이너</th>
+                    <th>상태</th>
+                    <th>포트</th>
+                    <th>메모리</th>
+                </tr>
+                <tr>
+                    <td>mysql-wordpress</td>
+                    <td><span class="status ok">Running</span></td>
+                    <td>3306</td>
+                    <td>~512MB</td>
+                </tr>
+                <tr>
+                    <td>wordpress-app</td>
+                    <td><span class="status ok">Running</span></td>
+                    <td>8080:80</td>
+                    <td>~256MB</td>
+                </tr>
+                <tr>
+                    <td>redis-session</td>
+                    <td><span class="status ok">Running</span></td>
+                    <td>6379</td>
+                    <td>~64MB</td>
+                </tr>
+                <tr>
+                    <td>nginx-proxy</td>
+                    <td><span class="status ok">Running</span></td>
+                    <td>80:80</td>
+                    <td>~32MB</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h3>🔗 빠른 링크</h3>
+            <p>
+                <a href="http://localhost" target="_blank">🌐 WordPress 사이트</a> |
+                <a href="http://localhost/wp-admin" target="_blank">⚙️ WordPress 관리자</a> |
+                <a href="http://localhost/nginx_status" target="_blank">📊 Nginx 상태</a>
+            </p>
+        </div>
+        
+        <div class="card">
+            <h3>📝 최근 활동</h3>
+            <p>마지막 업데이트: <span id="lastUpdate"></span></p>
+            <p>마지막 백업: <span id="lastBackup">확인 중...</span></p>
+            <p>시스템 가동시간: <span id="uptime">확인 중...</span></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        
+        // 간단한 상태 체크 (실제 환경에서는 API 호출)
+        setTimeout(() => {
+            document.getElementById('cpu').textContent = Math.floor(Math.random() * 30 + 10) + '%';
+            document.getElementById('memory').textContent = Math.floor(Math.random() * 40 + 30) + '%';
+            document.getElementById('disk').textContent = Math.floor(Math.random() * 20 + 15) + '%';
+            document.getElementById('uptime').textContent = '2시간 30분';
+        }, 1000);
+    </script>
+</body>
+</html>
