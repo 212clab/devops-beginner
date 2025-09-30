@@ -149,7 +149,8 @@ server {
         access_log off;
         allow 127.0.0.1;
         allow 172.0.0.0/8;
-        allow 192.168.0.0/16;
+        allow 0.0.0.0/0;
+        # allow 192.168.0.0/16;
         deny all;
     }
     
