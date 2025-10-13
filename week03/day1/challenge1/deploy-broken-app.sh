@@ -23,11 +23,11 @@ echo "🏗️  문제가 있는 애플리케이션들 배포 중..."
 
 # 시나리오 1: 포트 문제가 있는 Frontend 배포
 echo "📱 Frontend 애플리케이션 배포 중 (포트 문제 포함)..."
-kubectl apply -f broken-frontend.yaml
+kubectl apply -f broken-frontend-service.yaml
 
 # 시나리오 2: 환경변수 문제가 있는 API 서버 배포
 echo "🔧 API 서버 배포 중 (환경변수 문제 포함)..."
-kubectl apply -f broken-api-server.yaml
+kubectl apply -f broken-api-deployment.yaml
 
 # 시나리오 3: 잘못된 이미지 태그 배포
 echo "🖼️  Frontend v2 배포 중 (이미지 문제 포함)..."
@@ -35,7 +35,7 @@ kubectl apply -f broken-frontend-v2.yaml
 
 # 시나리오 4: 라벨 셀렉터 문제가 있는 Backend 배포
 echo "⚙️  Backend 서비스 배포 중 (라벨 문제 포함)..."
-kubectl apply -f broken-backend.yaml
+kubectl apply -f broken-backend-service.yaml
 
 # 정상적인 데이터베이스 (참조용)
 echo "🗄️  데이터베이스 배포 중 (정상)..."
