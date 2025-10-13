@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: day1-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-server
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+      - name: api
+        image: httpd:2.4.62
+        ports:
+        - containerPort: 80
+        env:
+        - name: DATABASE_HOST
+          value: "wrong-database-host"
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: API_PORT
+          value: "80"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: day1-challenge
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30081
+  selector:
+    app: api-server

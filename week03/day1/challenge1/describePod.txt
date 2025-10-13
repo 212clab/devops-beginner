@@ -1,0 +1,117 @@
+Name:             database-767d4c6bf9-kgrg8
+Namespace:        day1-challenge
+Priority:         0
+Service Account:  default
+Node:             challenge-cluster-worker3/172.19.0.5
+Start Time:       Mon, 13 Oct 2025 14:41:54 +0900
+Labels:           app=database
+                  pod-template-hash=767d4c6bf9
+Annotations:      <none>
+Status:           Running
+IP:               10.244.3.2
+IPs:
+  IP:           10.244.3.2
+Controlled By:  ReplicaSet/database-767d4c6bf9
+Containers:
+  postgres:
+    Container ID:   containerd://613af3ec65ffab762371fff9cace640faa5182069865a0a6c4fc6d1989bcb82a
+    Image:          postgres:16
+    Image ID:       docker.io/library/postgres@sha256:fb9aa6d07b0fe53e94e8470977f316d1cdb39b8cdb33c45279ff0bbe32067c25
+    Port:           5432/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Mon, 13 Oct 2025 14:42:04 +0900
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      POSTGRES_DB:        webstart
+      POSTGRES_USER:      admin
+      POSTGRES_PASSWORD:  password123
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bzvwb (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-bzvwb:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  3m58s  default-scheduler  Successfully assigned day1-challenge/database-767d4c6bf9-kgrg8 to challenge-cluster-worker3
+  Normal  Pulling    3m58s  kubelet            Pulling image "postgres:16"
+  Normal  Pulled     3m48s  kubelet            Successfully pulled image "postgres:16" in 10.15s (10.15s including waiting). Image size: 158720038 bytes.
+  Normal  Created    3m48s  kubelet            Created container: postgres
+  Normal  Started    3m48s  kubelet            Started container postgres
+
+
+Name:             frontend-v2-75dfb7d574-gmvj6
+Namespace:        day1-challenge
+Priority:         0
+Service Account:  default
+Node:             challenge-cluster-worker/172.19.0.3
+Start Time:       Mon, 13 Oct 2025 14:41:54 +0900
+Labels:           app=frontend-v2
+                  pod-template-hash=75dfb7d574
+Annotations:      <none>
+Status:           Pending
+IP:               10.244.1.2
+IPs:
+  IP:           10.244.1.2
+Controlled By:  ReplicaSet/frontend-v2-75dfb7d574
+Containers:
+  nginx:
+    Container ID:   
+    Image:          nginx:nonexistent-tag
+    Image ID:       
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+    Restart Count:  0
+    Requests:
+      cpu:        100m
+      memory:     128Mi
+    Environment:  <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-jkgvn (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-jkgvn:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  3m58s                default-scheduler  Successfully assigned day1-challenge/frontend-v2-75dfb7d574-gmvj6 to challenge-cluster-worker
+  Normal   Pulling    52s (x5 over 3m58s)  kubelet            Pulling image "nginx:nonexistent-tag"
+  Warning  Failed     51s (x5 over 3m57s)  kubelet            Failed to pull image "nginx:nonexistent-tag": rpc error: code = NotFound desc = failed to pull and unpack image "docker.io/library/nginx:nonexistent-tag": failed to resolve reference "docker.io/library/nginx:nonexistent-tag": docker.io/library/nginx:nonexistent-tag: not found
+  Warning  Failed     51s (x5 over 3m57s)  kubelet            Error: ErrImagePull
+  Normal   BackOff    2s (x15 over 3m56s)  kubelet            Back-off pulling image "nginx:nonexistent-tag"
+  Warning  Failed     2s (x15 over 3m56s)  kubelet            Error: ImagePullBackOff
