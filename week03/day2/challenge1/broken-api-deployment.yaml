@@ -8,8 +8,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 100%
-      maxSurge: 0%
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: api-server
@@ -20,19 +20,19 @@ spec:
     spec:
       containers:
       - name: api
-        image: nginx:1.27
+        image: nginx:1.26
         ports:
         - containerPort: 80
         livenessProbe:
           httpGet:
-            path: /custom-health
+            path: /
             port: 80
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 1
         readinessProbe:
           httpGet:
-            path: /custom-health
+            path: /
             port: 80
           initialDelaySeconds: 5
           periodSeconds: 5

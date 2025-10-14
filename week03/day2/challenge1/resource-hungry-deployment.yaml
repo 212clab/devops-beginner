@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-hungry
+  namespace: day2-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resource-hungry
+  template:
+    metadata:
+      labels:
+        app: resource-hungry
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27
+        resources:
+          requests:
+            cpu: 10000m
+            memory: 10Gi
