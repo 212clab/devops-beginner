@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-app
+  namespace: day2-challenge
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: broken-app
+  template:
+    metadata:
+      labels:
+        app: broken-app
+    spec:
+      containers:
+      - name: app
+        image: nginx:nonexistent-tag
+        ports:
+        - containerPort: 80
