@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
       - name: api
-        image: httpd:2.4.62
+        image: 212clab/w3d1c1:v1
         ports:
-        - containerPort: 80
+        - containerPort: 8080 # flask like 8080
         env:
         - name: DATABASE_HOST
-          value: "wrong-database-host"
+          value: "wrong-database-host" # 상관없다..
         - name: DATABASE_PORT
           value: "5432"
         - name: API_PORT
@@ -40,7 +40,7 @@ spec:
   type: NodePort
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
     nodePort: 30081
   selector:
     app: api-server
