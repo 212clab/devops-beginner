@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-room
+  namespace: game-namespace
+spec:
+  replicas: 5  # 예시, 필요에 따라 조정
+  selector:
+    matchLabels:
+      app: room
+  template:
+    metadata:
+      labels:
+        app: room
+    spec:
+      nodeSelector:
+        node-type: high-performance
+      containers:
+      - name: room
+        image: your-room-image:latest
+        ports:
+        - containerPort: 9000
+        resources:
+          requests:
+            cpu: 1  # CPU 집약적
+            memory: 512Mi

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-lobby
+  namespace: game-namespace
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: lobby
+  template:
+    metadata:
+      labels:
+        app: lobby
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - lobby
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: lobby
+        image: your-lobby-image:latest  # 실제 이미지로 교체
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
