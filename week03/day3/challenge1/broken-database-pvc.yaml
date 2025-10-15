@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-storage
+  namespace: day3-challenge
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Ti
+  storageClassName: nonexistent-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: day3-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - name: POSTGRES_DB
+          value: eshopdb
+        - name: POSTGRES_USER
+          value: eshopuser
+        - name: POSTGRES_PASSWORD
+          value: eshoppass
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: database-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-service
+  namespace: day3-challenge
+spec:
+  selector:
+    app: database
+  ports:
+  - port: 5432
+    targetPort: 5432

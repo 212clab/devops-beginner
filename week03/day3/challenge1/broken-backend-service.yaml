@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: day3-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://eshopuser:eshoppass@database-service:5432/eshopdb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wrong-backend-service
+  namespace: day3-challenge
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 3000
+    targetPort: 80
