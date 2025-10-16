@@ -22,3 +22,13 @@ cf. service(unique ClusterIP, DNS): loadBalancer
 
 1-3(*). ns 는 networkPolicy를 설치하기에 아주 찰떡 구조
 1-4(*). 그 외 label들로도 묶어 사용(ex. tier)
+
+
+---
+[표준 정책]
+Pod Security Standards (PSS)
+Admission Controller (OPA Gatekeeper)
+감사 로깅(Audit Logging)
+
+
+기본적으로 클러스터를 만든 사람이 root- 그리고 role과 rule을 정함
