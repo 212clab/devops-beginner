@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged-app
+  namespace: production
+spec:
+  containers:
+  - name: app
+    image: nginx:alpine
+    securityContext:
+      privileged: true # 특권 컨테이너는 절대 허용안함(Restricted)
+       
