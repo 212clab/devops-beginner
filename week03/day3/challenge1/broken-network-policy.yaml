@@ -13,7 +13,7 @@ spec:
   - from:
     - podSelector:
         matchLabels:
-          app: wrong-backend
+          app: backend
     ports:
     - protocol: TCP
       port: 5432

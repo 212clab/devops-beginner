@@ -17,7 +17,7 @@ spec:
       - name: backend
         image: nginx:alpine
         ports:
-        - containerPort: 80
+        - containerPort: 3000
         env:
         - name: DATABASE_URL
           value: "postgresql://eshopuser:eshoppass@database-service:5432/eshopdb"
@@ -25,7 +25,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wrong-backend-service
+  name: backend-service
   namespace: day3-challenge
 spec:
   selector:

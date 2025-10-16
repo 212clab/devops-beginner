@@ -46,3 +46,14 @@ echo "4. 네트워크 정책 차단 - 라벨 불일치"
 echo ""
 echo "🔍 문제 해결을 시작하세요!"
 echo "kubectl get all -n day3-challenge"
+
+
+# 0-2. 시스템 배포
+# ./deploy-broken-system.sh
+# ns 생성
+#  kubectl create namespace day3-challenge --dry-run=client -o yaml | kubectl apply -f - 
+# kubectl apply -f broken-database-pvc.yaml
+# kubectl apply -f broken-backend-service.yaml
+# kubectl apply -f frontend-deployment.yaml
+# kubectl apply -f broken-ingress.yaml
+# kubectl apply -f broken-network-policy.yaml
