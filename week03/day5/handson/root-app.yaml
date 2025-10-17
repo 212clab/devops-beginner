@@ -1,0 +1,19 @@
+# root-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-app
+  namespace: argocd
+spec:
+  project: day5-handson
+  source:
+    repoURL: https://github.com/your-org/gitops-repo
+    targetRevision: HEAD
+    path: apps
+  destination:
+    server: https://kubernetes.day5-handson.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,30 @@
+
+# apps/prod-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-app-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/your-repo
+    targetRevision: main
+    path: helm/web-app
+    helm:
+      valueFiles:
+        - values-prod.yaml
+      parameters:
+        - name: replicaCount
+          value: "5"
+        - name: image.tag
+          value: "v1.2.0"
+  destination:
+    server: https://kubernetes.default.svc  # 현재 클러스터
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: false  # 프로덕션은 수동 삭제
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

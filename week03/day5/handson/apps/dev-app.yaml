@@ -1,0 +1,29 @@
+# apps/dev-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-app-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/your-repo
+    targetRevision: develop
+    path: helm/web-app
+    helm:
+      valueFiles:
+        - values-dev.yaml
+      parameters:
+        - name: replicaCount
+          value: "2"
+        - name: image.tag
+          value: "dev-latest"
+  destination:
+    server: https://kubernetes.default.svc  # 현재 클러스터
+    namespace: development
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
