@@ -1,0 +1,39 @@
+# Week 3 Day 4 Challenge 1 - 문제 3: 잘못된 Network Policy
+# 의도적 오류:
+# 1. backend-policy: 잘못된 라벨 셀렉터 (tier: wrong-tier)
+# 2. backend-policy: 잘못된 포트 번호 (9999)
+# 3. database-policy: ingress 규칙 없음 (모든 트래픽 차단)
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+  namespace: securebank
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+      tier: wrong-tier  # 의도적 오류: 잘못된 라벨
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 9999  # 의도적 오류: 잘못된 포트
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-policy
+  namespace: securebank
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+  policyTypes:
+  - Ingress
+  # 의도적 오류: ingress 규칙 없음 (모든 트래픽 차단)

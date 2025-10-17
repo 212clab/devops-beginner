@@ -1,0 +1,16 @@
+# web-app-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web-app
+  namespace: default
+  labels:
+    app: web-app
+spec:
+  selector:
+    matchLabels:
+      app: web-app
+  endpoints:
+  - port: http
+    interval: 30s
+    path: /metrics

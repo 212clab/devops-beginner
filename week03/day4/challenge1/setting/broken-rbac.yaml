@@ -1,0 +1,38 @@
+# Week 3 Day 4 Challenge 1 - 문제 1: 잘못된 RBAC 설정
+# 의도적 오류:
+# 1. developer-role에 pods create 권한 없음
+# 2. pods/log에 get 권한 대신 list 권한
+# 3. RoleBinding이 잘못된 ServiceAccount 참조
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: developer-sa
+  namespace: securebank
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer-role
+  namespace: securebank
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get"]  # 의도적 오류: create 권한 없음
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["list"]  # 의도적 오류: get 권한 없음
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-binding
+  namespace: securebank
+subjects:
+- kind: ServiceAccount
+  name: wrong-developer-sa  # 의도적 오류: 잘못된 SA 이름
+  namespace: securebank
+roleRef:
+  kind: Role
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io

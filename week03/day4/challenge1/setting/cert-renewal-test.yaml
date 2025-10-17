@@ -1,0 +1,40 @@
+# Week 3 Day 4 Challenge 1 - 문제 2: 인증서 만료 시뮬레이션
+# Kind 클러스터에서는 실제 인증서 만료를 시뮬레이션하기 어려우므로
+# 인증서 갱신 프로세스를 테스트하는 리소스
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cert-info
+  namespace: securebank
+data:
+  cert-check.sh: |
+    #!/bin/bash
+    # 인증서 만료 확인 스크립트
+    echo "=== Kubernetes 인증서 확인 ==="
+    
+    # API Server 인증서 확인 (Kind 환경)
+    echo "1. API Server 인증서:"
+    kubectl get --raw /healthz/ready
+    
+    # ServiceAccount 토큰 확인
+    echo "2. ServiceAccount 토큰:"
+    kubectl get sa developer-sa -n securebank -o yaml
+    
+    echo ""
+    echo "💡 실제 환경에서는 다음 명령어로 인증서 확인:"
+    echo "kubeadm certs check-expiration"
+    echo "openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cert-checker
+  namespace: securebank
+spec:
+  serviceAccountName: developer-sa
+  containers:
+  - name: checker
+    image: bitnami/kubectl:latest
+    command: ["/bin/sh", "-c", "sleep 3600"]
+  restartPolicy: Never
