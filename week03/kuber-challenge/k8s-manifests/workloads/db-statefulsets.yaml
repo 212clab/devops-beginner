@@ -1,4 +1,4 @@
-# workloads/database-statefulsets.yaml
+# postgres-user StatefulSet (PVC를 직접 참조)
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -33,8 +33,11 @@ spec:
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
-          claimName: postgres-user-data
+          claimName: postgres-user-data # 10Gi PVC 참조
+
 ---
+
+# mongodb-product StatefulSet (VolumeClaimTemplates를 통해 PVC 자동 생성)
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -72,4 +75,4 @@ spec:
       storageClassName: standard-hdd
       resources:
         requests:
-          storage: 15Gi
+          storage: 15Gi # 15Gi PVC 자동 생성

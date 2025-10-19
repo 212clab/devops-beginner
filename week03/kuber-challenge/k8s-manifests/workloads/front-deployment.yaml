@@ -1,0 +1,28 @@
+# web-frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-frontend-deployment
+  namespace: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-frontend
+  template:
+    metadata:
+      labels:
+        app: web-frontend
+    spec:
+      containers:
+      - name: web-frontend
+        image: nginx:alpine # React SPA를 서비스할 웹 서버 이미지를 가정합니다.
+        ports:
+        - containerPort: 80 # Service의 targetPort와 일치
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

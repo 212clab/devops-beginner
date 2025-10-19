@@ -1,4 +1,7 @@
-# networking/api-services.yaml
+# 백엔드 API ClusterIP Service
+
+
+# user-service
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,7 +15,10 @@ spec:
     name: http
   selector:
     app: user-service
+
 ---
+
+# product-service
 apiVersion: v1
 kind: Service
 metadata:
@@ -26,7 +32,10 @@ spec:
     name: http
   selector:
     app: product-service
+
 ---
+
+# order-service
 apiVersion: v1
 kind: Service
 metadata:

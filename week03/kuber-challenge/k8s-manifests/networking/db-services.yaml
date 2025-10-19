@@ -1,4 +1,6 @@
-# networking/database-services.yaml
+# 데이터베이스 ClusterIP Service
+
+# postgres-user-service
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,7 +13,10 @@ spec:
     targetPort: 5432
   selector:
     app: postgres-user
+
 ---
+
+# mongodb-product-service
 apiVersion: v1
 kind: Service
 metadata:
@@ -24,7 +29,10 @@ spec:
     targetPort: 27017
   selector:
     app: mongodb-product
+
 ---
+
+# redis-cache-service
 apiVersion: v1
 kind: Service
 metadata:

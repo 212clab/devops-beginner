@@ -1,0 +1,36 @@
+# kind 이므로 수동으로 PV 생성하여, PVC와 바인딩 수동으로 해줘야함
+
+# 1. PostgreSQL User Data PV (10Gi, fast-ssd)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-user-pv
+  labels:
+    type: local
+spec:
+  storageClassName: fast-ssd
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/kind-data/postgres-user"
+    # Kind 노드 안의 경로를 지정합니다.
+
+---
+
+# 2. MongoDB Product Data PV (15Gi, standard-hdd)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-product-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard-hdd
+  capacity:
+    storage: 15Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/kind-data/mongodb-product"

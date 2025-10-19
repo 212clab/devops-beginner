@@ -1,4 +1,4 @@
-# workloads/api-deployments.yaml
+# user-service Deployment (DB 연결 환경변수 포함)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: nginx:alpine
+        image: nginx:alpine # 실제 서비스 이미지를 가정 (P. 7)
         ports:
         - containerPort: 8080
         env:
@@ -31,7 +31,10 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
+
 ---
+
+# product-service Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,7 +52,7 @@ spec:
     spec:
       containers:
       - name: product-service
-        image: nginx:alpine
+        image: nginx:alpine # 실제 서비스 이미지를 가정 (P. 8)
         ports:
         - containerPort: 8000
         env:

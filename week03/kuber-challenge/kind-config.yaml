@@ -1,0 +1,19 @@
+# kind-config.yaml 파일 내용
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cloudmart-cluster # 클러스터 이름 설정
+nodes:
+- role: control-plane
+  # Ingress를 위한 포트 포워딩 설정 (호스트의 80/443 포트로 연결)
+  # 💡 사용자님의 로컬 환경 포트 상황에 따라 80:80 대신 8080:80 등으로 변경할 수 있습니다.
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    listenAddress: "127.0.0.1"
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    listenAddress: "127.0.0.1"
+    protocol: TCP
+- role: worker # 워커 노드 1
+- role: worker # 워커 노드 2 (총 3개 노드)

@@ -1,4 +1,5 @@
-# networking/ingress.yaml
+# 도메인 및 경로 기반 라우팅
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -16,7 +17,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: web-frontend-service
+            name: web-frontend-service # Web Frontend Service (아직 생성 안됨, 다음 단계에 포함 예정)
             port:
               number: 80
   - host: api.example.com
@@ -28,7 +29,7 @@ spec:
           service:
             name: user-service
             port:
-              number: 8080
+              number: 8080 # user-service의 Service Port로 설정 (P. 5에서는 8880이지만 P. 5의 Service 정의를 따라 8080으로 수정)
       - path: /products
         pathType: Prefix
         backend:

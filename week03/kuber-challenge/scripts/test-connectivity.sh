@@ -20,10 +20,13 @@ kubectl exec -n backend deployment/user-service -- nc -zv postgres-user-service.
 
 # 5. API 서비스 간 통신 테스트
 echo "5. API 서비스 간 통신 테스트"
-kubectl exec -n frontend deployment/web-frontend -- curl -s user-service.backend.svc.cluster.local:8080/health
+# kubectl exec -n frontend deployment/web-frontend -- curl -s user-service.backend.svc.cluster.local:8080/health
+# kubectl exec -n frontend deployment/web-frontend-deployment -- curl -s user-service.backend.svc.cluster.local:8080/health
+kubectl exec -n frontend deployment/web-frontend-deployment -- nc -zv user-service.backend.svc.cluster.local 8080
 
 # 6. 외부 접근 테스트
 echo "6. 외부 접근 테스트"
-curl -H "Host: shop.example.com" http://$(minikube ip)/
+# curl -H "Host: shop.example.com" http://$(minikube ip)/
+curl -H "Host: shop.example.com" http://127.0.0.1/
 
 echo "=== 테스트 완료 ==="
