@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #2c3e50; }
+        .badge { 
+            background: #ff6b9d;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .info { 
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+        .api {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #ff6b9d;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Order Service</h1>
+        <div class="badge">MICROSERVICE</div>
+        
+        <div class="info">
+            <h2>📦 서비스 정보</h2>
+            <p><strong>서비스명:</strong> Order Microservice</p>
+            <p><strong>포트:</strong> 30082</p>
+            <p><strong>아키텍처:</strong> 마이크로서비스</p>
+            <p><strong>책임:</strong> 주문 관리 전담</p>
+        </div>
+
+        <div class="info">
+            <h2>🎯 제공 기능</h2>
+            <div class="api">GET /api/orders - 주문 목록 조회</div>
+            <div class="api">GET /api/orders/:id - 주문 상세 조회</div>
+            <div class="api">POST /api/orders - 주문 생성</div>
+            <div class="api">PUT /api/orders/:id - 주문 수정</div>
+            <div class="api">DELETE /api/orders/:id - 주문 취소</div>
+        </div>
+
+        <div class="info">
+            <h2>✅ 상태</h2>
+            <p>✅ Order Service 정상 동작 중</p>
+            <p>✅ Order DB 설정됨 (독립 데이터베이스)</p>
+            <p>💡 마이크로서비스 아키텍처: 각 서비스가 독립적인 DB 사용</p>
+            <p id="timestamp"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = 
+            '⏰ 접속 시간: ' + new Date().toLocaleString('ko-KR');
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ecommerce-hybrid-ingress
+  namespace: ecommerce-advanced
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ecommerce.local
+    http:
+      paths:
+      # 사용자 관련 요청은 마이크로서비스로
+      - path: /api/users
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 80
+      - path: /users
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 80
+      # 나머지 요청은 모놀리스로
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ecommerce-monolith-service
+            port:
+              number: 80

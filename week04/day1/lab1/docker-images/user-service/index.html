@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .badge { 
+            background: #6c5ce7;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .info { 
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .api {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #a29bfe;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 User Service</h1>
+        <div class="badge">MICROSERVICE</div>
+        
+        <div class="info">
+            <h2>📦 서비스 정보</h2>
+            <p><strong>서비스명:</strong> User Microservice</p>
+            <p><strong>포트:</strong> 30083</p>
+            <p><strong>아키텍처:</strong> 마이크로서비스</p>
+            <p><strong>책임:</strong> 사용자 관리 전담</p>
+        </div>
+
+        <div class="info">
+            <h2>🎯 제공 기능</h2>
+            <div class="api">GET /api/users - 사용자 목록 조회</div>
+            <div class="api">GET /api/users/:id - 사용자 상세 조회</div>
+            <div class="api">POST /api/users - 사용자 등록</div>
+            <div class="api">PUT /api/users/:id - 사용자 정보 수정</div>
+            <div class="api">DELETE /api/users/:id - 사용자 삭제</div>
+        </div>
+
+        <div class="info">
+            <h2>✅ 상태</h2>
+            <p>✅ User Service 정상 동작 중</p>
+            <p>✅ User DB 설정됨 (독립 데이터베이스)</p>
+            <p>💡 마이크로서비스 아키텍처: 각 서비스가 독립적인 DB 사용</p>
+            <p id="timestamp"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = 
+            '⏰ 접속 시간: ' + new Date().toLocaleString('ko-KR');
+    </script>
+</body>
+</html>

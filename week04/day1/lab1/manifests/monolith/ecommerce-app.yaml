@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecommerce-monolith
+  namespace: ecommerce-advanced
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce-monolith
+  template:
+    metadata:
+      labels:
+        app: ecommerce-monolith
+    spec:
+      containers:
+      - name: ecommerce-app
+        image: ecommerce-monolith:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: DB_HOST
+          value: postgres-service
+        - name: DB_NAME
+          value: ecommerce
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecommerce-monolith-service
+  namespace: ecommerce-advanced
+spec:
+  selector:
+    app: ecommerce-monolith
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
