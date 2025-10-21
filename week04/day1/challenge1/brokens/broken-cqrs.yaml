@@ -1,0 +1,151 @@
+# 문제 2: CQRS 패턴 읽기/쓰기 분리 오류
+# Command와 Query 서비스의 의도적 오류들
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: command-service
+  namespace: microservices-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: command-service
+  template:
+    metadata:
+      labels:
+        app: command-service
+    spec:
+      containers:
+      - name: command-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: command-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: command-config
+        configMap:
+          name: command-service-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: command-service-config
+  namespace: microservices-challenge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        # 🔧 FIX ME 1: JSON 형식이 올바르지 않습니다
+        location /api/commands/create-user {
+            return 200 '{
+                command_id: "cmd-001",
+                type: "CreateUserCommand",
+                status: "accepted",
+                event_id: "evt-001",
+                timestamp: "2024-01-01T10:00:00Z"
+            }';
+            add_header Content-Type application/json;
+        }
+        # 🔧 FIX ME 2: 이 경로로는 접근할 수 없습니다
+        location /api/commands/update-user-wrong {
+            return 200 '{
+                "command_id": "cmd-002", 
+                "type": "UpdateUserCommand",
+                "status": "accepted",
+                "event_id": "evt-002",
+                "timestamp": "2024-01-01T10:01:00Z"
+            }';
+            add_header Content-Type application/json;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: command-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    app: command-service
+  ports:
+  # 🔧 FIX ME 3: Service가 Pod에 연결되지 않습니다
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: query-service
+  namespace: microservices-challenge
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: query-service
+  template:
+    metadata:
+      labels:
+        app: query-service
+    spec:
+      containers:
+      - name: query-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: query-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: query-config
+        configMap:
+          name: query-service-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: query-service-config
+  namespace: microservices-challenge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        location /api/queries/users {
+            # 🔧 FIX ME 4: JSON 응답이 유효하지 않습니다
+            return 200 '{
+                "users": [
+                    {"id": 1, "name": "John Doe", "email": "john@example.com", "status": "active"},
+                    {"id": 2, "name": "Jane Smith", "email": "jane@example.com", "status": "active"
+                ],
+                "total": 2,
+                "source": "materialized_view",
+                "last_updated": "2024-01-01T10:01:00Z"
+            }';
+            add_header Content-Type application/json;
+        }
+        location /api/queries/user-stats {
+            return 200 '{
+                "total_users": 1000,
+                "active_users": 850,
+                "new_users_today": 25,
+                "source": "aggregated_view",
+                "last_updated": "2024-01-01T10:00:00Z"
+            }';
+            add_header Content-Type application/json;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: query-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    # 🔧 FIX ME 5: Service에 엔드포인트가 없습니다
+    app: wrong-query-service
+  ports:
+  - port: 80
+    targetPort: 80

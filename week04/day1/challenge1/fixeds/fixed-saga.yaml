@@ -1,0 +1,164 @@
+# 문제 1: Saga 패턴 트랜잭션 실패
+# 의도적 오류들이 포함된 Saga 구현
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: microservices-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: service-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: service-config
+        configMap:
+          name: order-service-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+  namespace: microservices-challenge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        # 🔧 FIX ME 5: Nginx 설정 문법 오류가 있습니다
+        location /api/orders {
+            return 200 '{"service": "order-service", "action": "create_order", "saga_id": "saga-001", "status": "initiated"}'
+            add_header Content-Type application/json;
+        }
+        location /api/orders/compensate {
+            return 200 '{"service": "order-service", "action": "cancel_order", "saga_id": "saga-001", "status": "compensated"}';
+            add_header Content-Type application/json;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    app: order-service
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: microservices-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+      - name: payment-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: service-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: service-config
+        configMap:
+          name: payment-service-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-config
+  namespace: microservices-challenge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        location /api/payments {
+            return 200 '{"service": "payment-service", "action": "process_payment", "saga_id": "saga-001", "status": "completed", "amount": 100.00}';
+            add_header Content-Type application/json;
+        }
+        location /api/payments/compensate {
+            return 200 '{"service": "payment-service", "action": "refund_payment", "saga_id": "saga-001", "status": "refunded", "amount": 100.00}';
+            add_header Content-Type application/json;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    app: payment-service
+  ports:
+  - port: 80
+    targetPort: 80
+---
+# 의도적 오류 2: Saga Job의 잘못된 설정
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: saga-orchestrator
+  namespace: microservices-challenge
+spec:
+  # 🔧 FIX ME 1: Job이 재시도를 하지 않습니다
+  backoffLimit: 0
+  template:
+    spec:
+      containers:
+      - name: saga-orchestrator
+        image: busybox:1.35
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "=== Saga Transaction Started ==="
+          echo "Step 1: Validate User"
+          
+          # 🔧 FIX ME 2: 서비스 URL이 해결되지 않습니다 ((수정!!🍎))
+          echo "Calling order service..."
+          wget -q -O- http://order-service/api/orders || echo "Order service call failed"
+          
+          # 🔧 FIX ME 3: 트랜잭션이 실패로 표시됩니다 ((수정!!🍎))
+          echo "Step 2: Create Order - SUCCESS"
+          echo "Step 3: Process Payment - SKIPPED"
+          echo "=== Saga Transaction Failed ==="
+          
+          # 🔧 FIX ME 4: Job이 항상 실패합니다 ((수정!!🍎))
+          exit 0
+      restartPolicy: Never
+---
+# 🚨 문제 3: Saga Orchestrator ConfigMap (잘못된 URL)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: saga-config
+  namespace: microservices-challenge
+data:
+  ORDER_SERVICE_URL: "http://order-service/api/orders"  # 🚨 FQDN 누락
+  PAYMENT_SERVICE_URL: "http://payment-service.microservices-challenge.svc.cluster.local/api/orders"

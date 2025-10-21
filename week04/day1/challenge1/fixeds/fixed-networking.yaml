@@ -1,0 +1,134 @@
+# 문제 4: 네트워킹 및 서비스 디스커버리 장애
+# Ingress와 Service 설정의 의도적 오류들
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: microservices-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: user-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: user-config
+        configMap:
+          name: user-service-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+  namespace: microservices-challenge
+data:
+  default.conf: |
+    server {
+        listen 80;
+        location /api/users {
+            return 200 '{"service": "user-service", "users": [{"id": 1, "name": "John Doe"}], "total": 1}';
+            add_header Content-Type application/json;
+        }
+        location /health {
+            return 200 '{"service": "user-service", "status": "healthy"}';
+            add_header Content-Type application/json;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    # 🔧 FIX ME 1: Service에 엔드포인트가 없습니다
+    app: user-service
+  ports:
+  - port: 80
+    targetPort: 80
+---
+# 의도적 오류 2: 잘못된 Ingress 설정
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ecommerce-ingress
+  namespace: microservices-challenge
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: api.local
+    http:
+      paths:
+      - path: /api/users
+        pathType: Prefix
+        backend:
+          service:
+            # 🔧 FIX ME 2: Ingress가 서비스를 찾을 수 없습니다
+            name: user-service
+            port:
+              number: 80
+      - path: /api/commands
+        pathType: Prefix
+        backend:
+          service:
+            name: command-service
+            port:
+              # 🔧 FIX ME 3: 연결이 거부됩니다 (Connection refused)
+              number: 80
+      - path: /api/queries
+        pathType: Prefix
+        backend:
+          service:
+            name: query-service
+            port:
+              number: 80
+---
+# 추가 테스트용 서비스 (DNS 테스트용)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-service
+  namespace: microservices-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-service
+  template:
+    metadata:
+      labels:
+        # 의도적 오류 5: 라벨 오타
+        app: test-service  # 
+    spec:
+      containers:
+      - name: test-service
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  namespace: microservices-challenge
+spec:
+  selector:
+    app: test-service  # 위의 Pod 라벨과 불일치
+  ports:
+  - port: 80
+    targetPort: 80
