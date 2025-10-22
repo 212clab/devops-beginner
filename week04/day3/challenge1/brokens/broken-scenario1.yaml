@@ -1,0 +1,22 @@
+# Week 4 Day 3 Challenge 1: 시나리오 1 - mTLS 설정 오류
+# 의도적 오류: PeerAuthentication의 잘못된 모드 설정
+
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: delivery-platform
+spec:
+  mtls:
+    mode: PERMISSIVE  # Mode 수정 필요
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: payment-service
+  namespace: delivery-platform
+spec:
+  host: payment-service.delivery-platform.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE  # Mode 수정 필요

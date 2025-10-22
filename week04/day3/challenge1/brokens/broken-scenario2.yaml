@@ -1,0 +1,31 @@
+# Week 4 Day 3 Challenge 1: 시나리오 2 - JWT 인증 오류
+# 의도적 오류: 잘못된 issuer 설정
+
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth
+  namespace: delivery-platform
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  jwtRules:
+  - issuer: "wrong-issuer"  # FQDN 수정 필요
+    jwksUri: "http://auth-service.delivery-platform.svc.cluster.local:8080/.well-known/jwks.json"
+    forwardOriginalToken: true
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: require-jwt
+  namespace: delivery-platform
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        requestPrincipals: ["*"]

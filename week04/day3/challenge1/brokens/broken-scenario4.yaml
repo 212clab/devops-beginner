@@ -1,0 +1,17 @@
+# Week 4 Day 3 Challenge 1: 시나리오 4 - Authorization Policy 오류
+# 의도적 오류: 잘못된 ServiceAccount principal
+
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: merchant-policy
+  namespace: delivery-platform
+spec:
+  selector:
+    matchLabels:
+      app: merchant-service
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/delivery-platform/sa/wrong-service-account"]  # 확인 필요

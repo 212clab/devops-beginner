@@ -1,0 +1,414 @@
+# Week 4 Day 3 Challenge 1: 기본 서비스 배포
+# 설명: Auth, Order, Delivery, Payment, Merchant 서비스
+
+---
+# Auth Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auth-service
+  namespace: delivery-platform
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+  namespace: delivery-platform
+data:
+  JWT_SECRET: "delivery-hub-secret-key-2025"
+  JWT_ALGORITHM: "HS256"
+  JWT_EXPIRATION: "3600"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: delivery-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        version: v1
+    spec:
+      serviceAccountName: auth-service
+      containers:
+      - name: auth
+        image: python:3.9-slim
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          pip install flask pyjwt
+          mkdir -p /app
+          cat > /app/auth.py <<'PYEOF'
+          from flask import Flask, request, jsonify
+          import jwt
+          import datetime
+          import os
+
+          app = Flask(__name__)
+          SECRET = os.getenv('JWT_SECRET', 'secret')
+          ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+          EXPIRATION = int(os.getenv('JWT_EXPIRATION', '3600'))
+
+          USERS = {'customer': 'pass123', 'rider': 'pass123', 'merchant': 'pass123'}
+
+          @app.route('/health')
+          def health():
+              return jsonify({'status': 'healthy'}), 200
+
+          @app.route('/login', methods=['POST'])
+          def login():
+              data = request.get_json()
+              username = data.get('username')
+              password = data.get('password')
+              
+              if username in USERS and USERS[username] == password:
+                  payload = {
+                      'sub': username,
+                      'iss': 'auth-service.delivery-platform.svc.cluster.local',
+                      'iat': datetime.datetime.utcnow(),
+                      'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=EXPIRATION)
+                  }
+                  token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
+                  return jsonify({'token': token}), 200
+              
+              return jsonify({'error': 'Invalid credentials'}), 401
+
+          if __name__ == '__main__':
+              app.run(host='0.0.0.0', port=8080)
+          PYEOF
+          python /app/auth.py
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: auth-config
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: delivery-platform
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+---
+# Order Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: order-service
+  namespace: delivery-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: delivery-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+        version: v1
+    spec:
+      serviceAccountName: order-service
+      containers:
+      - name: order
+        image: node:18-alpine
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          mkdir -p /app
+          cat > /app/server.js <<'JSEOF'
+          const http = require('http');
+          const server = http.createServer((req, res) => {
+            if (req.url === '/health') {
+              res.writeHead(200);
+              res.end('OK');
+            } else if (req.url === '/api/orders') {
+              res.writeHead(200, {'Content-Type': 'application/json'});
+              res.end(JSON.stringify({
+                message: 'Order created',
+                orderId: Math.floor(Math.random() * 10000),
+                timestamp: new Date().toISOString()
+              }));
+            } else {
+              res.writeHead(404);
+              res.end('Not Found');
+            }
+          });
+          server.listen(8080, () => console.log('Order service running on 8080'));
+          JSEOF
+          node /app/server.js
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: delivery-platform
+spec:
+  selector:
+    app: order-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+---
+# Delivery Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: delivery-service
+  namespace: delivery-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service
+  namespace: delivery-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: delivery-service
+  template:
+    metadata:
+      labels:
+        app: delivery-service
+        version: v1
+    spec:
+      serviceAccountName: delivery-service
+      containers:
+      - name: delivery
+        image: node:18-alpine
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          mkdir -p /app
+          cat > /app/server.js <<'JSEOF'
+          const http = require('http');
+          const server = http.createServer((req, res) => {
+            if (req.url === '/health') {
+              res.writeHead(200);
+              res.end('OK');
+            } else if (req.url === '/api/deliveries') {
+              res.writeHead(200, {'Content-Type': 'application/json'});
+              res.end(JSON.stringify({
+                message: 'Delivery assigned',
+                riderId: Math.floor(Math.random() * 1000),
+                timestamp: new Date().toISOString()
+              }));
+            } else {
+              res.writeHead(404);
+              res.end('Not Found');
+            }
+          });
+          server.listen(8080, () => console.log('Delivery service running on 8080'));
+          JSEOF
+          node /app/server.js
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery-service
+  namespace: delivery-platform
+spec:
+  selector:
+    app: delivery-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+---
+# Payment Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payment-service
+  namespace: delivery-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: delivery-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+        version: v1
+    spec:
+      serviceAccountName: payment-service
+      containers:
+      - name: payment
+        image: node:18-alpine
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          mkdir -p /app
+          cat > /app/server.js <<'JSEOF'
+          const http = require('http');
+          const server = http.createServer((req, res) => {
+            if (req.url === '/health') {
+              res.writeHead(200);
+              res.end('OK');
+            } else if (req.url === '/api/payments') {
+              res.writeHead(200, {'Content-Type': 'application/json'});
+              res.end(JSON.stringify({
+                message: 'Payment processed',
+                transactionId: Math.floor(Math.random() * 100000),
+                timestamp: new Date().toISOString()
+              }));
+            } else {
+              res.writeHead(404);
+              res.end('Not Found');
+            }
+          });
+          server.listen(8080, () => console.log('Payment service running on 8080'));
+          JSEOF
+          node /app/server.js
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: delivery-platform
+spec:
+  selector:
+    app: payment-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+---
+# Merchant Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: merchant-service
+  namespace: delivery-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: merchant-service
+  namespace: delivery-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: merchant-service
+  template:
+    metadata:
+      labels:
+        app: merchant-service
+        version: v1
+    spec:
+      serviceAccountName: merchant-service
+      containers:
+      - name: merchant
+        image: node:18-alpine
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          mkdir -p /app
+          cat > /app/server.js <<'JSEOF'
+          const http = require('http');
+          const server = http.createServer((req, res) => {
+            if (req.url === '/health') {
+              res.writeHead(200);
+              res.end('OK');
+            } else if (req.url === '/api/stores') {
+              res.writeHead(200, {'Content-Type': 'application/json'});
+              res.end(JSON.stringify({
+                stores: ['Store A', 'Store B', 'Store C'],
+                timestamp: new Date().toISOString()
+              }));
+            } else {
+              res.writeHead(404);
+              res.end('Not Found');
+            }
+          });
+          server.listen(8080, () => console.log('Merchant service running on 8080'));
+          JSEOF
+          node /app/server.js
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: merchant-service
+  namespace: delivery-platform
+spec:
+  selector:
+    app: merchant-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http

@@ -1,0 +1,68 @@
+# Week 4 Day 3 Challenge 1: 시나리오 3 - OPA 정책 위반
+# 의도적 오류: 리소스 제한 없는 Deployment
+
+---
+# ConstraintTemplate
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8scontainerresourcelimits
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sContainerResourceLimits
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8scontainerresourcelimits
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.template.spec.containers[_]
+          not container.resources.limits.cpu
+          msg := sprintf("컨테이너 '%v'에 CPU 제한이 없습니다", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.template.spec.containers[_]
+          not container.resources.limits.memory
+          msg := sprintf("컨테이너 '%v'에 메모리 제한이 없습니다", [container.name])
+        }
+---
+# Constraint
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerResourceLimits
+metadata:
+  name: require-resource-limits
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+    namespaces:
+      - "delivery-platform"
+---
+# 의도적 오류: 리소스 제한 없음
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service-broken
+  namespace: delivery-platform
+  labels:
+    scenario: "broken-3"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery-service-test
+  template:
+    metadata:
+      labels:
+        app: delivery-service-test
+    spec:
+      containers:
+      - name: delivery
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        # 의도적 오류: resources 설정 없음
