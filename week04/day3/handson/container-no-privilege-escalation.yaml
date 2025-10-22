@@ -1,0 +1,31 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8scontainernoprivilegeescalation
+  annotations:
+    description: "컨테이너의 권한 상승을 금지합니다"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sContainerNoPrivilegeEscalation
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8scontainernoprivilegeescalation
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          not has_field(container, "securityContext")
+          msg := sprintf("컨테이너 '%v'에 securityContext가 없습니다", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          container.securityContext.allowPrivilegeEscalation == true
+          msg := sprintf("컨테이너 '%v'에서 권한 상승이 허용되어 있습니다", [container.name])
+        }
+
+        has_field(obj, field) {
+          obj[field]
+        }

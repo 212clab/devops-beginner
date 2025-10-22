@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerResourceLimits
+metadata:
+  name: require-resource-limits
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - "secure-app"
+  parameters:
+    cpu: "1000m"
+    memory: "1Gi"
