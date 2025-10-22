@@ -12,6 +12,6 @@ spec:
       app: merchant-service
   action: ALLOW
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/delivery-platform/sa/wrong-service-account"]  # 확인 필요
+    - from:
+        - source: 
+            principals: ["cluster.local/ns/delivery-platform/sa/order-service"] # 확인 필요

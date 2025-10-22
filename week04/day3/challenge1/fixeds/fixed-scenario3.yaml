@@ -61,8 +61,15 @@ spec:
         app: delivery-service-test
     spec:
       containers:
-      - name: delivery
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        # 의도적 오류: resources 설정 없음
+        - name: delivery
+          image: nginx:alpine
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          ports:
+            - containerPort: 80
+          # 의도적 오류: resources 설정 없음

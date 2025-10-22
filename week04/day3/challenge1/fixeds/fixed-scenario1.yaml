@@ -8,7 +8,7 @@ metadata:
   namespace: delivery-platform
 spec:
   mtls:
-    mode: PERMISSIVE  # Mode 수정 필요
+    mode: STRICT # Mode 수정 필요
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
@@ -19,4 +19,4 @@ spec:
   host: payment-service.delivery-platform.svc.cluster.local
   trafficPolicy:
     tls:
-      mode: DISABLE  # Mode 수정 필요
+      mode: ISTIO_MUTUAL # Mode 수정 필요

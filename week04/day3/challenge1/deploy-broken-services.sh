@@ -9,15 +9,15 @@ echo "=== Challenge 문제 시스템 배포 시작 ==="
 
 # 1. 시나리오 1: mTLS PERMISSIVE 오류
 echo "1/4 시나리오 1 배포 중 (mTLS 설정 오류)..."
-kubectl apply -f broken-scenario1.yaml
+kubectl apply -f ./brokens/broken-scenario1.yaml
 
 # 2. 시나리오 2: JWT 잘못된 issuer
 echo "2/4 시나리오 2 배포 중 (JWT 검증 오류)..."
-kubectl apply -f broken-scenario2.yaml
+kubectl apply -f ./brokens/broken-scenario2.yaml
 
 # 3. 시나리오 3: OPA 리소스 제한 누락
 echo "3/4 시나리오 3 배포 중 (리소스 제한 오류)..."
-kubectl apply -f broken-scenario3.yaml
+kubectl apply -f ./brokens/broken-scenario3.yaml
 
 # ConstraintTemplate CRD 등록 대기
 echo "   ConstraintTemplate CRD 등록 대기 중..."
@@ -27,7 +27,7 @@ sleep 3
 
 # 4. 시나리오 4: Service 연결 오류
 echo "4/4 시나리오 4 배포 중 (네트워크 오류)..."
-kubectl apply -f broken-scenario4.yaml
+kubectl apply -f ./brokens/broken-scenario4.yaml
 
 echo ""
 echo "=== Challenge 문제 시스템 배포 완료 ==="
