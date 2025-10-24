@@ -59,14 +59,21 @@ data:
       kubernetes_sd_configs:
       - role: pod
       relabel_configs:
+      # 1. prometheus.io/scrape=true 어노테이션이 있는 Pod만 수집 대상으로 유지
       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
         action: keep
         regex: true
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+      # 2. prometheus.io/path 어노테이션이 있으면 그걸 메트릭 경로로 사용
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
         action: replace
-        target_label: __address__
+        target_label: __metrics_path__
+        regex: (.+)
+      # 3. IP 주소와 prometheus.io/port 어노테이션 값을 조합해 최종 접속 주소로 설정 (가장 중요!)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
         regex: ([^:]+)(?::\d+)?;(\d+)
         replacement: $1:$2
+        target_label: __address__
     - job_name: kubernetes-nodes
       kubernetes_sd_configs:
       - role: node
