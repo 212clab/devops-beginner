@@ -1,36 +1,36 @@
 #!/bin/bash
 # Week 4 Day 5 Hands-on 1: Grafana 대시보드 설치
 set -e
-echo "=== Grafana 대시보드 설치 시작 ==="
+# echo "=== Grafana 대시보드 설치 시작 ==="
 
-# Dashboard Provider 설정
-kubectl apply -f - <<'EOF'
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-dashboard-provider
-  namespace: monitoring
-data:
-  dashboards.yaml: |
-    apiVersion: 1
-    providers:
-    - name: default
-      orgId: 1
-      folder: ''
-      type: file
-      disableDeletion: false
-      updateIntervalSeconds: 10
-      allowUiUpdates: true
-      options:
-        path: /var/lib/grafana/dashboards
-EOF
+# # Dashboard Provider 설정
+# kubectl apply -f - <<'EOF'
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: grafana-dashboard-provider
+#   namespace: monitoring
+# data:
+#   dashboards.yaml: |
+#     apiVersion: 1
+#     providers:
+#     - name: default
+#       orgId: 1
+#       folder: ''
+#       type: file
+#       disableDeletion: false
+#       updateIntervalSeconds: 10
+#       allowUiUpdates: true
+#       options:
+#         path: /var/lib/grafana/dashboards
+# EOF
 
-# Grafana Deployment 업데이트 (기존 볼륨 제거 후 재추가)
-echo "2/3 Grafana Deployment 업데이트 중..."
+# # Grafana Deployment 업데이트 (기존 볼륨 제거 후 재추가)
+# echo "2/3 Grafana Deployment 업데이트 중..."
 
-# Grafana Deployment 삭제 후 재생성
-kubectl delete deployment grafana -n monitoring --ignore-not-found=true
-sleep 5
+# # Grafana Deployment 삭제 후 재생성
+# kubectl delete deployment grafana -n monitoring --ignore-not-found=true
+# sleep 5
 
 # Grafana Deployment 재생성 (볼륨 포함)
 kubectl apply -f - <<'GRAFANA_EOF'
@@ -82,7 +82,7 @@ spec:
           name: grafana-dashboards
 GRAFANA_EOF
 
-# Deployment 준비 대기
+# # Deployment 준비 대기
 kubectl wait --for=condition=available deployment/grafana -n monitoring --timeout=120s
 
 # 대시보드 ConfigMap 생성 (간단한 버전)

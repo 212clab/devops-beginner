@@ -1,0 +1,116 @@
+# grafana-complete-setup.yaml
+
+# 1. Grafana에게 대시보드를 어디서 찾을지 알려주는 설정 (Provider)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provider
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  # 이 파일이 /etc/grafana/provisioning/dashboards/ 에 생성됩니다.
+  default-provider.yaml: |-
+    apiVersion: 1
+    providers:
+    # 'default' 라는 이름의 프로바이더를 정의합니다.
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        # 이 경로에 있는 .json 파일을 모두 대시보드로 불러옵니다.
+        path: /var/lib/grafana/dashboards/default
+
+---
+# 2. 실제 FinOps 대시보드 내용을 담고 있는 ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finops-cost-analysis-dashboard
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  # 이 파일(finops-cost-analysis.json)이 위에서 지정한 path에 생성됩니다.
+  finops-cost-analysis.json: |-
+    {
+      "__inputs": [],
+      "__requires": [],
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "panels": [
+        {
+          "title": "FinOps Dashboard Placeholder",
+          "type": "text",
+          "description": "Please paste your full dashboard JSON here."
+        }
+      ],
+      "refresh": "1m",
+      "schemaVersion": 36,
+      "title": "FinOps Cost Analysis",
+      "uid": "finops-cost-analysis"
+    }
+
+---
+# 3. Grafana Service (NodePort로 외부 노출)
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    app: grafana
+  type: NodePort # 💡 외부 접속을 위해 NodePort 사용
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30091 # 💡 고정된 포트로 접속
+
+---
+# 4. Grafana Deployment (ConfigMap을 Volume으로 마운트하는 부분 추가)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          ports:
+            - containerPort: 3000
+          # 💡 [핵심] 위에서 만든 ConfigMap들을 Volume으로 컨테이너에 연결합니다.
+          volumeMounts:
+            # 1번 ConfigMap을 마운트 -> Grafana가 프로비저닝 설정을 읽음
+            - name: grafana-dashboard-provider-volume
+              mountPath: /etc/grafana/provisioning/dashboards
+            # 2번 ConfigMap을 마운트 -> Grafana가 실제 대시보드 파일을 읽음
+            - name: grafana-dashboards-volume
+              mountPath: /var/lib/grafana/dashboards/default
+      # 💡 [핵심] 컨테이너에서 사용할 Volume들을 정의합니다.
+      volumes:
+        - name: grafana-dashboard-provider-volume
+          configMap:
+            name: grafana-dashboard-provider
+        - name: grafana-dashboards-volume
+          configMap:
+            name: finops-cost-analysis-dashboard

@@ -35,10 +35,10 @@ echo "5/7 Grafana 설치..."
 "$SCRIPT_DIR/install-grafana.sh"
 echo ""
 
-# 6. Grafana 대시보드
-echo "6/7 Grafana 대시보드 설치..."
-"$SCRIPT_DIR/install-grafana-dashboards.sh"
-echo ""
+# # 6. Grafana 대시보드
+# echo "6/7 Grafana 대시보드 설치..."
+# "$SCRIPT_DIR/install-grafana-dashboards.sh"
+# echo ""
 
 # 7. Jaeger
 echo "7/7 Jaeger 설치..."
