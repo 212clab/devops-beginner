@@ -23,15 +23,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: analytics-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 200m
-            memory: 256Mi
-          # 의도적 오류: limits 누락
+        - name: analytics-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m (burst 허용)
+              memory: 512Mi (OOM 방지)
 
 ---
 apiVersion: apps/v1
@@ -55,15 +57,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: notification-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 150m
-            memory: 192Mi
-          # 의도적 오류: limits 누락
+        - name: notification-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 150m
+              memory: 192Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
 
 ---
 apiVersion: apps/v1
@@ -87,15 +91,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: search-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 300m
-            memory: 384Mi
-          # 의도적 오류: limits 누락
+        - name: search-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 300m
+              memory: 384Mi
+            limits:
+              cpu: 600m
+              memory: 768Mi
 
 ---
 apiVersion: apps/v1
@@ -119,16 +125,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: recommendation-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 250m
-            memory: 320Mi
-          # 의도적 오류: limits 누락
-          # limits:
+        - name: recommendation-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 250m
+              memory: 320Mi
+            limits:
+              cpu: 500m
+              memory: 640Mi
 
 ---
 # Staging 환경 - 일부 서비스도 limits 누락
@@ -153,13 +160,14 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: analytics-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          # 의도적 오류: limits 누락
-          # limits:
+        - name: analytics-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

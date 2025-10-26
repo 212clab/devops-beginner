@@ -23,17 +23,17 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: frontend
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: 2000m      # 의도적 오류: 과도한 CPU 할당
-            memory: 4Gi     # 의도적 오류: 과도한 메모리 할당
-          limits:
-            cpu: 4000m
-            memory: 8Gi
+        - name: frontend
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 200m # 실제 사용량의 2배 (여유)
+              memory: 256Mi # 실제 사용량의 2배 (여유)
+            limits:
+              cpu: 500m # burst 허용
+              memory: 512Mi # OOM 방지
 
 ---
 apiVersion: apps/v1
@@ -57,17 +57,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: user-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 1500m      # 의도적 오류: 과도한 CPU 할당 (실제 사용량 150m)
-            memory: 3Gi     # 의도적 오류: 과도한 메모리 할당 (실제 사용량 384Mi)
-          limits:
-            cpu: 3000m
-            memory: 6Gi
+        - name: user-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 200m # 실제 사용량의 2배 (여유)
+              memory: 256Mi # 실제 사용량의 2배 (여유)
+            limits:
+              cpu: 500m # burst 허용
+              memory: 512Mi # OOM 방지
 
 ---
 apiVersion: apps/v1
@@ -91,17 +91,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: product-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 1000m      # 의도적 오류: 과도한 CPU 할당 (실제 사용량 100m)
-            memory: 2Gi     # 의도적 오류: 과도한 메모리 할당 (실제 사용량 256Mi)
-          limits:
-            cpu: 2000m
-            memory: 4Gi
+        - name: product-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 200m # 실제 사용량의 2배 (여유)
+              memory: 256Mi # 실제 사용량의 2배 (여유)
+            limits:
+              cpu: 500m # burst 허용
+              memory: 512Mi # OOM 방지
 
 ---
 apiVersion: apps/v1
@@ -125,14 +125,15 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: order-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 1200m      # 의도적 오류: 과도한 CPU 할당 (실제 사용량 120m)
-            memory: 2.5Gi   # 의도적 오류: 과도한 메모리 할당 (실제 사용량 320Mi)
-          limits:
-            cpu: 2400m
-            memory: 5Gi
+        - name: order-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 200m # 실제 사용량의 2배 (여유)
+              memory: 256Mi # 실제 사용량의 2배 (여유)
+            limits:
+              cpu: 500m # burst 허용
+              memory: 512Mi # OOM 방지
+

@@ -13,7 +13,7 @@ metadata:
     tier: frontend
     cost-center: CC-1002
 spec:
-  replicas: 5  # 의도적 오류: Production과 동일
+  replicas: 1 # 의도적 오류: Production과 동일
   selector:
     matchLabels:
       app: frontend
@@ -24,17 +24,17 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: frontend
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+        - name: frontend
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 
 ---
 apiVersion: apps/v1
@@ -47,7 +47,7 @@ metadata:
     tier: backend
     cost-center: CC-1002
 spec:
-  replicas: 5  # 의도적 오류: Production과 동일
+  replicas: 2 # 의도적 오류: Production과 동일
   selector:
     matchLabels:
       app: user-service
@@ -58,17 +58,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: user-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+        - name: user-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 
 ---
 apiVersion: apps/v1
@@ -81,7 +81,7 @@ metadata:
     tier: backend
     cost-center: CC-1002
 spec:
-  replicas: 2  # 의도적 오류: Production과 동일
+  replicas: 1 # 의도적 오류: Production과 동일
   selector:
     matchLabels:
       app: product-service
@@ -92,17 +92,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: product-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+        - name: product-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 
 ---
 # Development 환경 - 의도적 오류: 불필요한 다중 복제본
@@ -116,7 +116,7 @@ metadata:
     tier: frontend
     cost-center: CC-1003
 spec:
-  replicas: 2  # 의도적 오류: 불필요한 복제본
+  replicas: 1 # 의도적 오류: 불필요한 복제본
   selector:
     matchLabels:
       app: frontend
@@ -127,17 +127,17 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: frontend
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
+        - name: frontend
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
 
 ---
 apiVersion: apps/v1
@@ -150,7 +150,7 @@ metadata:
     tier: backend
     cost-center: CC-1003
 spec:
-  replicas: 3  # 의도적 오류: 불필요한 복제본
+  replicas: 1 # 의도적 오류: 불필요한 복제본
   selector:
     matchLabels:
       app: user-service
@@ -161,17 +161,17 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: user-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
+        - name: user-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
 
 ---
 apiVersion: apps/v1
@@ -184,7 +184,7 @@ metadata:
     tier: backend
     cost-center: CC-1003
 spec:
-  replicas: 2  # 의도적 오류: 불필요한 복제본
+  replicas: 1 # 의도적 오류: 불필요한 복제본
   selector:
     matchLabels:
       app: product-service
@@ -195,36 +195,36 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: product-service
-        image: nginx:alpine
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
+        - name: product-service
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
 
 ---
 # Staging HPA - 의도적 오류: 주석 처리됨
-# apiVersion: autoscaling/v2
-# kind: HorizontalPodAutoscaler
-# metadata:
-#   name: frontend-hpa
-#   namespace: staging
-# spec:
-#   scaleTargetRef:
-#     apiVersion: apps/v1
-#     kind: Deployment
-#     name: frontend
-#   minReplicas: 1
-#   maxReplicas: 5
-#   metrics:
-#   - type: Resource
-#     resource:
-#       name: cpu
-#       target:
-#         type: Utilization
-#         averageUtilization: 70
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend-hpa
+  namespace: staging
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

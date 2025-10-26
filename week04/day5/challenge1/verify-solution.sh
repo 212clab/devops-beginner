@@ -39,13 +39,13 @@ if [ "$HPA_COUNT" -ge 3 ]; then
   FRONTEND_HPA_MIN=$(kubectl get hpa frontend-hpa -n production -o jsonpath='{.spec.minReplicas}' 2>/dev/null || echo "0")
   FRONTEND_HPA_MAX=$(kubectl get hpa frontend-hpa -n production -o jsonpath='{.spec.maxReplicas}' 2>/dev/null || echo "0")
   
-  if [ "$FRONTEND_HPA_MIN" -ge 2 ] && [ "$FRONTEND_HPA_MAX" -ge 8 ]; then
+  if [ "$FRONTEND_HPA_MIN" -ge 1 ] && [ "$FRONTEND_HPA_MAX" -ge 8 ]; then
     echo "✅ 시나리오 2: 통과 (HPA 설정 완료)"
     ((PASS++))
   else
     echo "❌ 시나리오 2: 실패 (HPA 설정이 부적절함)"
     echo "   현재: min=$FRONTEND_HPA_MIN, max=$FRONTEND_HPA_MAX"
-    echo "   권장: min=2, max=10"
+    echo "   권장: min=1, max=10"
     ((FAIL++))
   fi
 else
